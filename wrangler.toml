@@ -1,21 +1,13 @@
 name = "testpcbweb"
-type = "javascript"
 main = "dist/index.html"
-site = { bucket = "dist" }
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "dist"
 
 [build]
 command = "npm run build"
-cwd = "./"
-watch_paths = ["src/**/*.{js,jsx,ts,tsx,vue}"]
-
-[build.upload]
-format = "modules"
-main = "./functions/git-proxy.js"
 
 [[routes]]
 pattern = "/git-proxy/*"
 zone_name = "weegeeday.com"
-
-[compatibility_date]
-date = "2024-01-01"
-flags = ["nodejs_compat_v2"]
