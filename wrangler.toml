@@ -1,0 +1,30 @@
+name = "testpcbweb"
+type = "javascript"
+main = "dist/index.html"
+site = { bucket = "dist" }
+
+[env.production]
+routes = [
+  { pattern = "git.weegeeday.com/*", zone_name = "weegeeday.com" }
+]
+
+[[routes]]
+pattern = "/git-proxy/*"
+custom_domain = true
+
+[build]
+command = "npm run build"
+cwd = "./"
+watch_paths = ["src/**/*.{js,jsx,ts,tsx,vue}"]
+
+[build.upload]
+format = "modules"
+main = "./functions/git-proxy.js"
+
+[compatibility_date]
+date = "2024-01-01"
+flags = ["nodejs_compat_v2"]
+
+[env.production.routes]
+pattern = "https://pcb.weegeeday.com/*"
+zone_name = "weegeeday.com"
