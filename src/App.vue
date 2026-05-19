@@ -173,6 +173,8 @@ const espTerminal = {
 }
 
 // Flashing sequence
+const GIT_API_BASE = import.meta.env.DEV ? '/git-proxy' : 'https://git.weegeeday.com'
+
 const flashLatestFirmware = async () => {
   isFlashing.value = true
   flashError.value = null
@@ -180,8 +182,8 @@ const flashLatestFirmware = async () => {
   flashStatus.value = 'Resolving latest release...'
   
   try {
-    // 1. Fetch latest release details via CORS proxy
-    const res = await fetch('/git-proxy/api/v1/repos/weegeeday/RCCar/releases')
+    // 1. Fetch latest release details from the Git server
+    const res = await fetch(`${GIT_API_BASE}/api/v1/repos/weegeeday/RCCar/releases`)
     if (!res.ok) throw new Error(`Failed to check releases: ${res.statusText}`)
     const releases = await res.json()
     const newestRelease = releases[0]
@@ -191,8 +193,10 @@ const flashLatestFirmware = async () => {
     const asset = newestRelease.assets.find(a => a.name === 'firm.bin')
     if (!asset) throw new Error(`No firm.bin found in release ${newestRelease.name}`)
     
-    // Convert direct URL to proxy URL
-    const proxyDownloadUrl = asset.browser_download_url.replace('https://git.weegeeday.com', '/git-proxy')
+    // Use the direct asset URL in production, proxy in development
+    const proxyDownloadUrl = import.meta.env.DEV
+      ? asset.browser_download_url.replace('https://git.weegeeday.com', '/git-proxy')
+      : asset.browser_download_url
     
     // 2. Download firmware
     flashStatus.value = `Downloading firm.bin (version ${newestRelease.name})...`
