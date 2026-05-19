@@ -180,8 +180,8 @@ const flashLatestFirmware = async () => {
   flashStatus.value = 'Resolving latest release...'
   
   try {
-    // 1. Fetch latest release details via the CORS proxy (works in dev via Vite proxy, in production via backend)
-    const res = await fetch('/git-proxy/api/v1/repos/weegeeday/RCCar/releases')
+    // 1. Fetch latest release details directly from the Git server
+    const res = await fetch('https://git.weegeeday.com/api/v1/repos/weegeeday/RCCar/releases')
     if (!res.ok) throw new Error(`Failed to check releases: ${res.statusText}`)
     
     // Validate response is JSON before parsing
@@ -198,8 +198,8 @@ const flashLatestFirmware = async () => {
     const asset = newestRelease.assets.find(a => a.name === 'firm.bin')
     if (!asset) throw new Error(`No firm.bin found in release ${newestRelease.name}`)
     
-    // Use the proxy for downloads too
-    const proxyDownloadUrl = asset.browser_download_url.replace('https://git.weegeeday.com', '/git-proxy')
+    // Use the direct asset URL
+    const proxyDownloadUrl = asset.browser_download_url
     
     // 2. Download firmware
     flashStatus.value = `Downloading firm.bin (version ${newestRelease.name})...`
